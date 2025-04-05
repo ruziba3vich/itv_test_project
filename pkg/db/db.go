@@ -28,5 +28,8 @@ func NewDB(cfg *config.DBConfig) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to migrate database: %v", err)
 	}
 
+	if err := db.AutoMigrate(&models.User{}); err != nil {
+		return nil, fmt.Errorf("failed to migrate database: %v", err)
+	}
 	return db, nil
 }
