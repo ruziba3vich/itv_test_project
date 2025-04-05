@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ruziba3vich/itv_test_project/internal/service"
+	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 )
 
@@ -51,10 +52,7 @@ func (h *AuthHandler) RegisterRoutes(router *gin.Engine) {
 // @Failure 500 {object} gin.H
 // @Router /login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}
+	var req types.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.log.Warn("Invalid login request", map[string]interface{}{
 			"error": err.Error(),
@@ -114,9 +112,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Failure 500 {object} gin.H
 // @Router /refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
+	var req types.RefreshTokenReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.log.Warn("Invalid refresh token request", map[string]interface{}{
 			"error": err.Error(),
@@ -139,7 +135,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	h.log.Info("Access token refreshed successfully", map[string]interface{}{
 		"token": req.RefreshToken,
 	})
-	c.JSON(http.StatusOK, gin.H{
-		"access_token": accessToken,
+	c.JSON(http.StatusOK, types.RefreshTokenResponse{
+		AccessToken: accessToken,
 	})
 }

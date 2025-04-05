@@ -72,8 +72,29 @@ func (s *UserStorage) GetRefreshToken(ctx context.Context, token string) (*model
 	return &refreshToken, nil
 }
 
+// Login checks user credentials and returns a JWT token
+func (s *UserStorage) Login(ctx context.Context, username, password string) error {
+	user, err := s.getUserByUsername(ctx, username)
+	if err != nil {
+		return fmt.Errorf("user not found")
+	}
+
+	// Check password
+	if !checkPassword(user.Password, password) {
+		return errors.New("invalid username or password")
+	}
+
+	return nil
+}
+
 // hashPassword hashes a password using bcrypt
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err
+}
+
+// CheckPassword verifies a hashed password
+func checkPassword(hashedPassword, plainPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+	return err == nil
 }
