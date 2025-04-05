@@ -131,3 +131,12 @@ func (s *TokenService) ValidateJWT(tokenString string) (string, error) {
 	// Return an error if the token is not valid
 	return "", fmt.Errorf("invalid token")
 }
+
+// RegisterUser creates a new user
+func (s *TokenService) RegisterUser(ctx context.Context, user *models.User) error {
+	err := s.store.CreateUser(ctx, user)
+	if err != nil {
+		s.log.Error("Failed to create user: " + err.Error())
+	}
+	return err
+}
