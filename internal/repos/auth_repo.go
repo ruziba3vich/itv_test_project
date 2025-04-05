@@ -11,6 +11,6 @@ type (
 		GenerateTokens(ctx context.Context, userID uint) (string, string, error)
 		RefreshAccessToken(ctx context.Context, refreshToken string) (string, error)
 		ValidateJWT(tokenString string) (string, error)
-		LoginUser(ctx context.Context, req *types.LoginUserRequest) error
+		LoginUser(ctx context.Context, req *types.LoginUserRequest) (uint, error)
 	}
 )
