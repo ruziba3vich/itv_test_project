@@ -7,9 +7,9 @@ import (
 )
 
 type IMovieService interface {
-	Create(ctx context.Context, req *types.CreateMovieRequest) (*types.CreateMovieResponse, error)
-	Delete(ctx context.Context, req *types.DeleteMovieRequest) (*types.DeleteMovieResponse, error)
-	GetAll(ctx context.Context, req *types.GetAllRequest) (*types.GetAllResponse, error)
-	GetByID(ctx context.Context, req *types.GetByIDRequest) (*types.GetByIDResponse, error)
-	Update(ctx context.Context, id uint, req *types.UpdateMovieRequest) (*types.UpdateMovieResponse, error)
+	CreateMovie(ctx context.Context, req *types.CreateMovieRequest) (*types.CreateMovieResponse, error)
+	DeleteMovie(ctx context.Context, req *types.DeleteMovieRequest) (*types.DeleteMovieResponse, error)
+	GetAllMovies(ctx context.Context, req *types.GetAllRequest) (*types.GetAllResponse, error)
+	GetMovieByID(ctx context.Context, req *types.GetByIDRequest) (*types.GetByIDResponse, error)
+	UpdateMovie(ctx context.Context, id uint, req *types.UpdateMovieRequest) (*types.UpdateMovieResponse, error)
 }
