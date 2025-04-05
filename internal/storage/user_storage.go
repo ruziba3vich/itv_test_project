@@ -50,6 +50,28 @@ func (s *UserStorage) getUserByUsername(ctx context.Context, username string) (*
 	return &user, nil
 }
 
+// CreateRefreshToken stores a new refresh token
+func (s *UserStorage) CreateRefreshToken(ctx context.Context, token *models.RefreshToken) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(token).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// GetRefreshToken retrieves a refresh token by its value
+func (s *UserStorage) GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error) {
+	var refreshToken models.RefreshToken
+	if err := s.db.Where("token = ?", token).First(&refreshToken).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // Token not found
+		}
+		return nil, err
+	}
+	return &refreshToken, nil
+}
+
 // hashPassword hashes a password using bcrypt
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
