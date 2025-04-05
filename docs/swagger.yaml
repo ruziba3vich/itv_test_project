@@ -1,0 +1,297 @@
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_models.Movie:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        allOf:
+        - $ref: '#/definitions/gorm.DeletedAt'
+        description: Soft delete support
+      director:
+        type: string
+      id:
+        type: integer
+      plot:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      year:
+        type: integer
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.CreateMovieRequest:
+    properties:
+      director:
+        type: string
+      plot:
+        description: Optional, max length 1000 chars
+        maxLength: 1000
+        type: string
+      title:
+        type: string
+      year:
+        description: Reasonable year range
+        maximum: 2100
+        minimum: 1888
+        type: integer
+    required:
+    - director
+    - title
+    - year
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.CreateMovieResponse:
+    properties:
+      created_at:
+        type: string
+      director:
+        type: string
+      id:
+        type: integer
+      plot:
+        type: string
+      title:
+        type: string
+      year:
+        type: integer
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.DeleteMovieResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.GetAllResponse:
+    properties:
+      movies:
+        items:
+          $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_models.Movie'
+        type: array
+      total_count:
+        description: Total number of movies for pagination
+        type: integer
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.GetByIDResponse:
+    properties:
+      created_at:
+        type: string
+      director:
+        type: string
+      id:
+        type: integer
+      plot:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      year:
+        type: integer
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.UpdateMovieRequest:
+    properties:
+      director:
+        description: Optional
+        minLength: 1
+        type: string
+      plot:
+        description: Optional
+        maxLength: 1000
+        type: string
+      title:
+        description: Optional, min length 1
+        minLength: 1
+        type: string
+      year:
+        description: Optional
+        maximum: 2100
+        minimum: 1888
+        type: integer
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.UpdateMovieResponse:
+    properties:
+      director:
+        type: string
+      id:
+        type: integer
+      plot:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      year:
+        type: integer
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /movies:
+    get:
+      description: Retrieves a paginated list of all movies
+      parameters:
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.GetAllResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Get all movies
+      tags:
+      - movies
+    post:
+      consumes:
+      - application/json
+      description: Creates a new movie record in the database
+      parameters:
+      - description: Movie data
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.CreateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.CreateMovieResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Create a new movie
+      tags:
+      - movies
+  /movies/{id}:
+    delete:
+      description: Deletes a movie by ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.DeleteMovieResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Delete a movie
+      tags:
+      - movies
+    get:
+      description: Retrieves a specific movie by its ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.GetByIDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Get a movie by ID
+      tags:
+      - movies
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing movie by ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated movie data
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.UpdateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.UpdateMovieResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/gin.H'
+      security:
+      - BearerAuth: []
+      summary: Update a movie
+      tags:
+      - movies
+swagger: "2.0"
