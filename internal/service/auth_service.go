@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ruziba3vich/itv_test_project/internal/models"
 	"github.com/ruziba3vich/itv_test_project/internal/storage"
+	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 )
 
@@ -137,6 +138,14 @@ func (s *TokenService) RegisterUser(ctx context.Context, user *models.User) erro
 	err := s.store.CreateUser(ctx, user)
 	if err != nil {
 		s.log.Error("Failed to create user: " + err.Error())
+	}
+	return err
+}
+
+func (s *TokenService) LoginUser(ctx context.Context, req *types.LoginUserRequest) error {
+	err := s.LoginUser(ctx, req)
+	if err != nil {
+		s.log.Error("error logging in user: " + err.Error())
 	}
 	return err
 }
