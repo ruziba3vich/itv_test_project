@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/ruziba3vich/itv_test_project/internal/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,11 @@ type (
 
 // CreateUser adds a new user to the database
 func (s *UserStorage) CreateUser(ctx context.Context, user *models.User) error {
+	hashedPassword, err := hashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	user.Password = hashedPassword
 	existingUser, err := s.getUserByUsername(ctx, *user.Username)
 	if err != nil {
 		return fmt.Errorf("failed to verify username availability: %s", err.Error())
@@ -42,4 +48,10 @@ func (s *UserStorage) getUserByUsername(ctx context.Context, username string) (*
 		return nil, err
 	}
 	return &user, nil
+}
+
+// hashPassword hashes a password using bcrypt
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
 }
