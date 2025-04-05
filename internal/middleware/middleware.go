@@ -12,15 +12,15 @@ import (
 
 // AuthHandler holds dependencies for authentication
 type AuthHandler struct {
-	userRepo repos.IMovieService
+	authRepo repos.AuthRepo
 	logger   *log.Logger
 	limiter  *limiter.TokenBucketLimiter
 }
 
 // NewAuthHandler initializes and returns an AuthHandler instance
-func NewAuthHandler(userRepo repos.IMovieService, logger *log.Logger, limiter *limiter.TokenBucketLimiter) *AuthHandler {
+func NewAuthHandler(authRepo repos.AuthRepo, logger *log.Logger, limiter *limiter.TokenBucketLimiter) *AuthHandler {
 	return &AuthHandler{
-		userRepo: userRepo,
+		authRepo: authRepo,
 		logger:   logger,
 		limiter:  limiter,
 	}
@@ -57,7 +57,7 @@ func (a *AuthHandler) AuthMiddleware() func(gin.HandlerFunc) gin.HandlerFunc {
 
 			parts := strings.Split(tokenString, " ")
 
-			userID, err := a.userRepo.ValidateJWT(parts[1])
+			userID, err := a.authRepo.ValidateJWT(parts[1])
 			if err != nil {
 				a.logger.Println("Invalid token:", err)
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
