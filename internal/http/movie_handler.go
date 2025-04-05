@@ -8,8 +8,10 @@ import (
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 
-	_ "github.com/swaggo/files"       // Swagger UI files
+	_ "github.com/swaggo/files" // Swagger UI files
+	swaggerFiles "github.com/swaggo/files"
 	_ "github.com/swaggo/gin-swagger" // Required for Swagger
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // MovieHandler handles HTTP requests for movies
@@ -25,6 +27,7 @@ func NewMovieHandler(svc *service.MovieService, log *logger.Logger) *MovieHandle
 
 // RegisterRoutes registers movie-related routes
 func (h *MovieHandler) RegisterRoutes(router *gin.Engine) {
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.POST("/movies", h.CreateMovie)
 	router.GET("/movies", h.GetAllMovies)
 	router.GET("/movies/:id", h.GetMovieByID)
