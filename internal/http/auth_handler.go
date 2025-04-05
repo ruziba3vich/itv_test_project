@@ -1,31 +1,24 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ruziba3vich/itv_test_project/internal/repos"
 	"github.com/ruziba3vich/itv_test_project/internal/service"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 )
 
-// AuthRepo interface (assuming it’s defined elsewhere, e.g., in a service package)
-type AuthRepo interface {
-	GenerateTokens(ctx context.Context, userID uint) (string, string, error)
-	RefreshAccessToken(ctx context.Context, refreshToken string) (string, error)
-	ValidateJWT(tokenString string) (string, error)
-}
-
 // AuthHandler manages authentication-related endpoints
 type AuthHandler struct {
-	authRepo AuthRepo              // Abstract field for token operations
+	authRepo repos.AuthRepo        // Abstract field for token operations
 	userSvc  *service.TokenService // For user validation during login
 	log      *logger.Logger        // For logging
 }
 
 // NewAuthHandler creates a new AuthHandler with dependencies
-func NewAuthHandler(authRepo AuthRepo, userSvc *service.TokenService, log *logger.Logger) *AuthHandler {
+func NewAuthHandler(authRepo repos.AuthRepo, userSvc *service.TokenService, log *logger.Logger) *AuthHandler {
 	return &AuthHandler{
 		authRepo: authRepo,
 		userSvc:  userSvc,
@@ -60,6 +53,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
+
+	err := h.authRepo.LoginUser(c.Request.Context(), &req)
+	if err != nil {
+		h.log.Error("Failed to retrieve user", map[string]interface{}{
+			"error":    err.Error(),
+			"username": req.Username,
+		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "login failed"})
+		return
+	}
+
+	// h.authRepo.GenerateTokens(c.Request.Context(), )
 
 	// // Validate user credentials
 	// user, err := h.userSvc.GetUserByUsername(c.Request.Context(), req.Username)
