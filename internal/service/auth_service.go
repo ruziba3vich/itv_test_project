@@ -142,10 +142,10 @@ func (s *TokenService) RegisterUser(ctx context.Context, user *models.User) erro
 	return err
 }
 
-func (s *TokenService) LoginUser(ctx context.Context, req *types.LoginUserRequest) error {
-	err := s.LoginUser(ctx, req)
+func (s *TokenService) LoginUser(ctx context.Context, req *types.LoginUserRequest) (uint, error) {
+	id, err := s.LoginUser(ctx, req)
 	if err != nil {
 		s.log.Error("error logging in user: " + err.Error())
 	}
-	return err
+	return id, err
 }
