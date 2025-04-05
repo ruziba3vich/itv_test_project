@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -101,4 +102,32 @@ func (s *TokenService) RefreshAccessToken(ctx context.Context, refreshToken stri
 		"user_id": rt.UserID,
 	})
 	return accessTokenStr, nil
+}
+
+// ValidateJWT validates a JWT token and returns the user ID
+func (s *TokenService) ValidateJWT(tokenString string) (string, error) {
+	// Parse the token and verify the signature method
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		// Check that the signing method is HMAC
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(s.secret), nil
+	})
+
+	// Return an error if the token could not be parsed
+	if err != nil {
+		return "", fmt.Errorf("failed to parse token: %v", err)
+	}
+
+	// Extract and validate claims
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if userID, exists := claims["user_id"].(string); exists {
+			return userID, nil
+		}
+		return "", fmt.Errorf("user_id not found in token claims")
+	}
+
+	// Return an error if the token is not valid
+	return "", fmt.Errorf("invalid token")
 }
