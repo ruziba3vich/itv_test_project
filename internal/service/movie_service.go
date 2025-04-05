@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/ruziba3vich/itv_test_project/internal/repos"
 	"github.com/ruziba3vich/itv_test_project/internal/storage"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
@@ -15,7 +16,7 @@ type MovieService struct {
 }
 
 // NewMovieService initializes a new MovieService
-func NewMovieService(storage *storage.MovieStorage, logger *logger.Logger) *MovieService {
+func NewMovieService(storage *storage.MovieStorage, logger *logger.Logger) repos.IMovieService {
 	return &MovieService{storage: storage, logger: logger}
 }
 
