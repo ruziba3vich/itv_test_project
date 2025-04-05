@@ -1,0 +1,145 @@
+package handlers
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/ruziba3vich/itv_test_project/internal/service"
+	"github.com/ruziba3vich/itv_test_project/pkg/logger"
+)
+
+// AuthRepo interface (assuming it’s defined elsewhere, e.g., in a service package)
+type AuthRepo interface {
+	GenerateTokens(ctx context.Context, userID uint) (string, string, error)
+	RefreshAccessToken(ctx context.Context, refreshToken string) (string, error)
+	ValidateJWT(tokenString string) (string, error)
+}
+
+// AuthHandler manages authentication-related endpoints
+type AuthHandler struct {
+	authRepo AuthRepo              // Abstract field for token operations
+	userSvc  *service.TokenService // For user validation during login
+	log      *logger.Logger        // For logging
+}
+
+// NewAuthHandler creates a new AuthHandler with dependencies
+func NewAuthHandler(authRepo AuthRepo, userSvc *service.TokenService, log *logger.Logger) *AuthHandler {
+	return &AuthHandler{
+		authRepo: authRepo,
+		userSvc:  userSvc,
+		log:      log,
+	}
+}
+
+// RegisterRoutes sets up authentication routes
+func (h *AuthHandler) RegisterRoutes(router *gin.Engine) {
+	router.POST("/login", h.Login)
+	router.POST("/refresh", h.RefreshToken)
+}
+
+// Login godoc
+// @Summary User login
+// @Description Authenticates a user and returns access and refresh tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param credentials body struct{ Username string; Password string } true "User credentials"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /login [post]
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req struct {
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.log.Warn("Invalid login request", map[string]interface{}{
+			"error": err.Error(),
+		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+
+	// // Validate user credentials
+	// user, err := h.userSvc.GetUserByUsername(c.Request.Context(), req.Username)
+	// if err != nil {
+	// 	h.log.Error("Failed to retrieve user", map[string]interface{}{
+	// 		"error":    err.Error(),
+	// 		"username": req.Username,
+	// 	})
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "login failed"})
+	// 	return
+	// }
+	// if user == nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)) != nil {
+	// 	h.log.Warn("Invalid login attempt", map[string]interface{}{
+	// 		"username": req.Username,
+	// 	})
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+	// 	return
+	// }
+
+	// // Generate tokens
+	// accessToken, refreshToken, err := h.authRepo.GenerateTokens(c.Request.Context(), user.ID)
+	// if err != nil {
+	// 	h.log.Error("Failed to generate tokens", map[string]interface{}{
+	// 		"error":   err.Error(),
+	// 		"user_id": user.ID,
+	// 	})
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate tokens"})
+	// 	return
+	// }
+
+	// h.log.Info("User logged in successfully", map[string]interface{}{
+	// 	"user_id": user.ID,
+	// })
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"access_token":  accessToken,
+	// 	"refresh_token": refreshToken,
+	// })
+}
+
+// RefreshToken godoc
+// @Summary Refresh access token
+// @Description Generates a new access token using a refresh token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param refresh_token body struct{ RefreshToken string } true "Refresh token"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /refresh [post]
+func (h *AuthHandler) RefreshToken(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.log.Warn("Invalid refresh token request", map[string]interface{}{
+			"error": err.Error(),
+		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+
+	// Refresh the access token
+	accessToken, err := h.authRepo.RefreshAccessToken(c.Request.Context(), req.RefreshToken)
+	if err != nil {
+		h.log.Warn("Failed to refresh access token", map[string]interface{}{
+			"error": err.Error(),
+			"token": req.RefreshToken,
+		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired refresh token"})
+		return
+	}
+
+	h.log.Info("Access token refreshed successfully", map[string]interface{}{
+		"token": req.RefreshToken,
+	})
+	c.JSON(http.StatusOK, gin.H{
+		"access_token": accessToken,
+	})
+}
