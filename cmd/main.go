@@ -8,6 +8,8 @@ import (
 	handlers "github.com/ruziba3vich/itv_test_project/internal/http"
 	"github.com/ruziba3vich/itv_test_project/internal/middleware"
 	"github.com/ruziba3vich/itv_test_project/internal/routereg"
+	"github.com/ruziba3vich/itv_test_project/internal/service"
+	"github.com/ruziba3vich/itv_test_project/internal/storage"
 	"github.com/ruziba3vich/itv_test_project/pkg/config"
 	"github.com/ruziba3vich/itv_test_project/pkg/db"
 	"go.uber.org/fx"
@@ -18,13 +20,17 @@ func main() {
 		fx.Provide(
 			config.LoadDBConfig,
 			db.NewDB,
+			storage.NewMovieStorage,
+			service.NewMovieService,
+			service.NewTokenService,
 			NewGinEngine,
 			handlers.NewMovieHandler,
+			handlers.NewAuthHandler,
 			middleware.NewAuthHandler,
-			
 		),
 		fx.Invoke(
-			routereg.RegisterRoutes,
+			routereg.RegisterMovieRoutes,
+			routereg.RegisterAuthRoutes,
 		),
 	)
 
