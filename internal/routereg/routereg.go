@@ -14,6 +14,9 @@ import (
 func RegisterMovieRoutes(router *gin.Engine, middleware *middleware.AuthHandler, handler *handlers.MovieHandler) {
 	// Swagger route
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/health", func(c *gin.Context) {
+		c.Status(200)
+	})
 
 	authMiddleware := middleware.AuthMiddleware()
 	movie_router := router.Group("api/v1")
