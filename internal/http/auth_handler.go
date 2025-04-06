@@ -63,7 +63,7 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 			"error":    err.Error(),
 			"username": req.Username,
 		})
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "registration failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "registration failed: " + err.Error()})
 		return
 	}
 

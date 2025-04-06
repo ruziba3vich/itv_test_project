@@ -58,6 +58,19 @@ definitions:
       year:
         type: integer
     type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.CreateUserRequest:
+    properties:
+      full_name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - full_name
+    - password
+    - username
+    type: object
   github_com_ruziba3vich_itv_test_project_internal_types.DeleteMovieResponse:
     properties:
       message:
@@ -89,6 +102,35 @@ definitions:
         type: string
       year:
         type: integer
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.LoginUserRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.LoginUserResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.RefreshTokenReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_ruziba3vich_itv_test_project_internal_types.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
     type: object
   github_com_ruziba3vich_itv_test_project_internal_types.UpdateMovieRequest:
     properties:
@@ -136,6 +178,40 @@ definitions:
 info:
   contact: {}
 paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns access and refresh tokens
+      parameters:
+      - description: User login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Access and refresh tokens
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.LoginUserResponse'
+        "400":
+          description: 'error: invalid request'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: 'error: invalid credentials'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: 'error: login failed'
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: User login
+      tags:
+      - auth
   /movies:
     get:
       description: Retrieves a paginated list of all movies
@@ -294,4 +370,72 @@ paths:
       summary: Update a movie
       tags:
       - movies
+  /refresh:
+    post:
+      consumes:
+      - application/json
+      description: Generates a new access token using a refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.RefreshTokenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New access token
+          schema:
+            $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.RefreshTokenResponse'
+        "400":
+          description: 'error: invalid request'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "401":
+          description: 'error: invalid or expired refresh token'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: 'error: refresh failed'
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Refresh access token
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the provided credentials
+      parameters:
+      - description: User registration data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_ruziba3vich_itv_test_project_internal_types.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: User registered successfully'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: 'error: invalid request'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "409":
+          description: 'error: username already taken'
+          schema:
+            $ref: '#/definitions/gin.H'
+        "500":
+          description: 'error: registration failed'
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Register a new user
+      tags:
+      - auth
 swagger: "2.0"

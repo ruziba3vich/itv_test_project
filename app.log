@@ -18,3 +18,8 @@
 {"level":"info","msg":"Invalid token: user_id not found in token claims","time":"2025-04-06T14:42:11+05:00"}
 {"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:45:09+05:00"}
 {"error":"Key: 'GetAllRequest.Limit' Error:Field validation for 'Limit' failed on the 'min' tag","level":"info","msg":"Invalid get all movies request","time":"2025-04-06T14:45:25+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:46:32+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:51:21+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:53:41+05:00"}
+{"level":"error","msg":"Failed to create user: this username is already taken","time":"2025-04-06T14:54:18+05:00"}
+{"error":"this username is already taken","level":"info","msg":"Failed to register user","time":"2025-04-06T14:54:18+05:00","username":"prodonik"}

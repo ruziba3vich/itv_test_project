@@ -104,4 +104,12 @@ type (
 	RefreshTokenResponse struct {
 		AccessToken string `json:"access_token"`
 	}
+
+	UsernameAlreadyTakenError struct {
+		Message string `json:"message"`
+	}
 )
+
+func (u *UsernameAlreadyTakenError) Error() string {
+	return "this username is already taken"
+}
