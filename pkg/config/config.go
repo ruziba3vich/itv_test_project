@@ -18,6 +18,7 @@ type (
 		AppPort    string
 		AccessTTL  int
 		RefreshTTL int
+		MovieTTL   int
 	}
 
 	RedisConfig struct {
@@ -71,6 +72,7 @@ func LoadConfig() *Config {
 		AppPort:    getEnv("APP_PORT", ":7777"),
 		AccessTTL:  getEnvInt("ACCESS_TTL", 15),
 		RefreshTTL: getEnvInt("REFRESH_TTL", 30),
+		MovieTTL:   getEnvInt("MOVIE_TTL", 20),
 	}
 	return cfg
 }
