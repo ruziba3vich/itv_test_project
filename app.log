@@ -37,3 +37,4 @@
 {"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T16:58:08+05:00"}
 {"level":"info","msg":"Tokens generated successfully","time":"2025-04-06T16:58:35+05:00","user_id":1}
 {"level":"info","msg":"User logged in successfully","time":"2025-04-06T16:58:35+05:00","user_id":1}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-07T00:46:25+05:00"}

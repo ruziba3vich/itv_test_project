@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	handlers "github.com/ruziba3vich/itv_test_project/internal/http"
 	"github.com/ruziba3vich/itv_test_project/internal/middleware"
+	redis_service "github.com/ruziba3vich/itv_test_project/internal/redis_cl"
 	"github.com/ruziba3vich/itv_test_project/internal/routereg"
 	"github.com/ruziba3vich/itv_test_project/internal/service"
 	"github.com/ruziba3vich/itv_test_project/internal/storage"
@@ -27,6 +29,7 @@ func main() {
 			logger.NewLogger,
 			db.NewDB,
 			NewRateLimiter,
+			NewRedisService,
 			storage.NewMovieStorage,
 			storage.NewUserStorage,
 			service.NewMovieService,
@@ -63,8 +66,8 @@ func RunServer(lc fx.Lifecycle, router *gin.Engine, logger *logger.Logger, cfg *
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			go func() {
-				logger.Info("Starting server on port 7777")
-				if err := router.Run(cfg.AppPort); err != nil {
+				logger.Info("Starting server on port " + cfg.AppPort)
+				if err := router.Run(":" + cfg.AppPort); err != nil {
 					logger.Error("Failed to start server: " + err.Error())
 				}
 			}()
@@ -79,4 +82,9 @@ func RunServer(lc fx.Lifecycle, router *gin.Engine, logger *logger.Logger, cfg *
 
 func NewRateLimiter(redisClient *redis.Client, cfg *config.Config) *rl.TokenBucketLimiter {
 	return rl.NewTokenBucketLimiter(redisClient, cfg.RLConfig.MaxTokens, float64(cfg.RLConfig.RefillRate), cfg.RLConfig.Window)
+}
+
+func NewRedisService(rediscl *redis.Client, cfg *config.Config, logger *logger.Logger) *redis_service.RedisService {
+	ttl := time.Duration(cfg.MovieTTL) * time.Minute
+	return redis_service.NewRedisService(rediscl, logger, ttl)
 }
