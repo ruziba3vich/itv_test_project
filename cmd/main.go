@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	handlers "github.com/ruziba3vich/itv_test_project/internal/http"
 	"github.com/ruziba3vich/itv_test_project/internal/middleware"
 	"github.com/ruziba3vich/itv_test_project/internal/routereg"
@@ -25,7 +26,7 @@ func main() {
 			rediscl.NewRedisClient,
 			logger.NewLogger,
 			db.NewDB,
-			rl.NewTokenBucketLimiter,
+			NewRateLimiter,
 			storage.NewMovieStorage,
 			storage.NewUserStorage,
 			service.NewMovieService,
@@ -54,4 +55,8 @@ func main() {
 // NewGinEngine provides the Gin engine instance
 func NewGinEngine() *gin.Engine {
 	return gin.Default() // This creates a new Gin engine instance with default middleware
+}
+
+func NewRateLimiter(redisClient *redis.Client, cfg *config.Config) *rl.TokenBucketLimiter {
+	return rl.NewTokenBucketLimiter(redisClient, cfg.RLConfig.MaxTokens, float64(cfg.RLConfig.RefillRate), cfg.RLConfig.Window)
 }

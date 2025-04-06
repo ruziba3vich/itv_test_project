@@ -33,7 +33,7 @@ type (
 
 	RateLimiterConfig struct {
 		MaxTokens  int
-		RefillRate float32
+		RefillRate float64
 		Window     time.Duration
 	}
 )
@@ -69,10 +69,10 @@ func LoadConfig() *Config {
 	return cfg
 }
 
-func getEnvFloat(key string, fallback float32) float32 {
+func getEnvFloat(key string, fallback float64) float64 {
 	if value, exists := os.LookupEnv(key); exists {
 		window, _ := strconv.ParseFloat(value, 32)
-		return float32(window)
+		return window
 	}
 	return fallback
 }
