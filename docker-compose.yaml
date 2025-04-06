@@ -25,6 +25,7 @@ services:
       RL_MAX_TOKENS: 4
       RL_WINDOW: 1
       RL_REFILL_RATE: 0.25
+      APP_PORT: 7777
     ports:
       - "7777:7777"
     networks:
