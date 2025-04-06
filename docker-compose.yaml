@@ -90,6 +90,22 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+  # dragonfly:
+  #   image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+  #   container_name: dragonfly
+  #   restart: always
+  #   command: "--requirepass ''"
+  #   volumes:
+  #     - dragonfly_data:/data
+  #   ports:
+  #     - "6379:6379"
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #   networks:
+  #     - my_network
 
 volumes:
   postgres_data:
