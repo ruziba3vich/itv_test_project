@@ -1,0 +1,2 @@
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T06:32:57+05:00"}
+{"error":"Key: 'GetAllRequest.Limit' Error:Field validation for 'Limit' failed on the 'min' tag","level":"info","msg":"Invalid get all movies request","time":"2025-04-06T06:33:08+05:00"}
