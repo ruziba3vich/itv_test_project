@@ -8,7 +8,7 @@ import (
 )
 
 // RegisterRoutes registers all routes, injecting the necessary dependencies
-func RegisterRoutes(router *gin.Engine, authMiddleware func(gin.HandlerFunc) gin.HandlerFunc, handler *handlers.MovieHandler) {
+func RegisterMovieRoutes(router *gin.Engine, authMiddleware func(gin.HandlerFunc) gin.HandlerFunc, handler *handlers.MovieHandler) {
 	// Swagger route
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -18,4 +18,11 @@ func RegisterRoutes(router *gin.Engine, authMiddleware func(gin.HandlerFunc) gin
 	router.GET("/movies/:id", handler.GetMovieByID)
 	router.PUT("/movies/:id", authMiddleware(handler.UpdateMovie))
 	router.DELETE("/movies/:id", authMiddleware(handler.DeleteMovie))
+}
+
+// RegisterRoutes registers all authentication-related routes
+func RegisterAuthRoutes(router *gin.Engine, handler *handlers.AuthHandler) {
+	router.POST("/register", handler.RegisterUser) // Separate endpoint for registration
+	router.POST("/login", handler.Login)
+	router.POST("/refresh", handler.RefreshToken)
 }
