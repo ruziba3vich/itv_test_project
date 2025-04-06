@@ -23,7 +23,7 @@ func (s *UserStorage) CreateUser(ctx context.Context, user *models.User) error {
 		return err
 	}
 	user.Password = hashedPassword
-	existingUser, err := s.getUserByUsername(ctx, *user.Username)
+	existingUser, err := s.getUserByUsername(ctx, user.Username)
 	if err != nil {
 		return fmt.Errorf("failed to verify username availability: %s", err.Error())
 	}
