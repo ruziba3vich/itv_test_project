@@ -4,51 +4,73 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ruziba3vich/itv_test_project/internal/models"
 	"github.com/ruziba3vich/itv_test_project/internal/repos"
-	"github.com/ruziba3vich/itv_test_project/internal/service"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 )
 
 // AuthHandler manages authentication-related endpoints
 type AuthHandler struct {
-	authRepo repos.AuthRepo        // Abstract field for token operations
-	userSvc  *service.TokenService // For user validation during login
-	log      *logger.Logger        // For logging
+	authRepo repos.AuthRepo // Abstract field for token operations
+	log      *logger.Logger // For logging
 }
 
 // NewAuthHandler creates a new AuthHandler with dependencies
-func NewAuthHandler(authRepo repos.AuthRepo, userSvc *service.TokenService, log *logger.Logger) *AuthHandler {
+func NewAuthHandler(authRepo repos.AuthRepo, log *logger.Logger) *AuthHandler {
 	return &AuthHandler{
 		authRepo: authRepo,
-		userSvc:  userSvc,
 		log:      log,
 	}
 }
 
-// Login godoc
-// @Summary User registration
-// @Description Registers a new user
+// RegisterUser godoc
+// @Summary Register a new user
+// @Description Registers a new user with the provided credentials
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param credentials body types.CreateUserRequest true "User credentials"
-// @Success 200 {object} gin.H
-// @Failure 400 {object} gin.H
-// @Failure 401 {object} gin.H
-// @Failure 500 {object} gin.H
-// @Router /login [post]
+// @Param user body types.CreateUserRequest true "User registration data"
+// @Success 200 {object} gin.H "message: User registered successfully"
+// @Failure 400 {object} gin.H "error: invalid request"
+// @Failure 409 {object} gin.H "error: username already taken"
+// @Failure 500 {object} gin.H "error: registration failed"
+// @Router /register [post]
 func (h *AuthHandler) RegisterUser(c *gin.Context) {
 	var req types.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.log.Warn("Invalid login request", map[string]interface{}{
+		h.log.Warn("Invalid registration request", map[string]interface{}{
 			"error": err.Error(),
 		})
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	// h.authRepo.
+	err := h.authRepo.RegisterUser(c.Request.Context(), &models.User{
+		Fullname: req.Fullname,
+		Username: req.Username,
+		Password: req.Password,
+	})
+	if err != nil {
+		if err.Error() == "username already taken" {
+			h.log.Warn("Duplicate username during registration", map[string]interface{}{
+				"username": req.Username,
+			})
+			c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
+			return
+		}
+		h.log.Error("Failed to register user", map[string]interface{}{
+			"error":    err.Error(),
+			"username": req.Username,
+		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "registration failed"})
+		return
+	}
+
+	h.log.Info("User registered successfully", map[string]interface{}{
+		"username": req.Username,
+	})
+	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
 }
 
 // Login godoc
@@ -57,11 +79,11 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param credentials body types.LoginUserRequest true "User credentials"
-// @Success 200 {object} types.LoginUserResponse
-// @Failure 400 {object} gin.H
-// @Failure 401 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Param credentials body types.LoginUserRequest true "User login credentials"
+// @Success 200 {object} types.LoginUserResponse "Access and refresh tokens"
+// @Failure 400 {object} gin.H "error: invalid request"
+// @Failure 401 {object} gin.H "error: invalid credentials"
+// @Failure 500 {object} gin.H "error: login failed"
 // @Router /login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req types.LoginUserRequest
@@ -75,7 +97,14 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	id, err := h.authRepo.LoginUser(c.Request.Context(), &req)
 	if err != nil {
-		h.log.Error("Failed to retrieve user", map[string]interface{}{
+		if err.Error() == "invalid credentials" {
+			h.log.Warn("Invalid login attempt", map[string]interface{}{
+				"username": req.Username,
+			})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+			return
+		}
+		h.log.Error("Failed to login user", map[string]interface{}{
 			"error":    err.Error(),
 			"username": req.Username,
 		})
@@ -85,14 +114,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	accessTokenStr, refreshTokenStr, err := h.authRepo.GenerateTokens(c.Request.Context(), id)
 	if err != nil {
-		h.log.Error("Failed to retrieve user", map[string]interface{}{
-			"error":    err.Error(),
-			"username": req.Username,
+		h.log.Error("Failed to generate tokens", map[string]interface{}{
+			"error":   err.Error(),
+			"user_id": id,
 		})
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "login failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "token generation failed"})
 		return
 	}
 
+	h.log.Info("User logged in successfully", map[string]interface{}{
+		"user_id": id,
+	})
 	c.JSON(http.StatusOK, types.LoginUserResponse{
 		AccessToken:  accessTokenStr,
 		RefreshToken: refreshTokenStr,
@@ -105,11 +137,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param refresh_token body struct{ RefreshToken string } true "Refresh token"
-// @Success 200 {object} map[string]string
-// @Failure 400 {object} gin.H
-// @Failure 401 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Param request body types.RefreshTokenReq true "Refresh token request"
+// @Success 200 {object} types.RefreshTokenResponse "New access token"
+// @Failure 400 {object} gin.H "error: invalid request"
+// @Failure 401 {object} gin.H "error: invalid or expired refresh token"
+// @Failure 500 {object} gin.H "error: refresh failed"
 // @Router /refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	var req types.RefreshTokenReq
@@ -121,7 +153,6 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Refresh the access token
 	accessToken, err := h.authRepo.RefreshAccessToken(c.Request.Context(), req.RefreshToken)
 	if err != nil {
 		h.log.Warn("Failed to refresh access token", map[string]interface{}{
