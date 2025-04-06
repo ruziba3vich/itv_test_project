@@ -12,6 +12,7 @@ import (
 	"github.com/ruziba3vich/itv_test_project/internal/repos"
 	"github.com/ruziba3vich/itv_test_project/internal/storage"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
+	"github.com/ruziba3vich/itv_test_project/pkg/config"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 )
 
@@ -25,11 +26,11 @@ type TokenService struct {
 }
 
 // NewTokenService creates a new TokenService
-func NewTokenService(store *storage.UserStorage, log *logger.Logger, secret string) repos.AuthRepo {
+func NewTokenService(store *storage.UserStorage, log *logger.Logger, cfg *config.Config) repos.AuthRepo {
 	return &TokenService{
 		store:      store,
 		log:        log,
-		secret:     secret,
+		secret:     cfg.JwtSecret,
 		accessTTL:  15 * time.Minute,   // Access token expires in 15 minutes
 		refreshTTL: 7 * 24 * time.Hour, // Refresh token expires in 7 days
 	}

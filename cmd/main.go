@@ -13,6 +13,7 @@ import (
 	"github.com/ruziba3vich/itv_test_project/pkg/config"
 	"github.com/ruziba3vich/itv_test_project/pkg/db"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
+	"github.com/ruziba3vich/itv_test_project/pkg/rediscl"
 	rl "github.com/ruziba3vich/prodonik_rl"
 	"go.uber.org/fx"
 )
@@ -20,7 +21,8 @@ import (
 func main() {
 	app := fx.New(
 		fx.Provide(
-			config.LoadDBConfig,
+			config.LoadConfig,
+			rediscl.NewRedisClient,
 			logger.NewLogger,
 			db.NewDB,
 			rl.NewTokenBucketLimiter,
