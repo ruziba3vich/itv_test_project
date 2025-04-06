@@ -63,14 +63,27 @@ func (s *MovieStorage) GetAll(ctx context.Context, req *types.GetAllRequest) (*t
 		count  int64
 	)
 
-	if err := s.db.WithContext(ctx).Model(&models.Movie{}).Count(&count).Error; err != nil {
-		return nil, err
-	}
+	// Start a transaction with REPEATABLE READ isolation level
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// Set isolation level to REPEATABLE READ
+		if err := tx.Exec("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ").Error; err != nil {
+			return err
+		}
 
-	if err := s.db.WithContext(ctx).
-		Limit(req.Limit).
-		Offset(req.Offset).
-		Find(&movies).Error; err != nil {
+		// Get total count of movies
+		if err := tx.Model(&models.Movie{}).Count(&count).Error; err != nil {
+			return err
+		}
+
+		// Get paginated movie list
+		if err := tx.Limit(req.Limit).Offset(req.Offset).Find(&movies).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
