@@ -60,7 +60,7 @@ func (a *AuthHandler) AuthMiddleware() func(gin.HandlerFunc) gin.HandlerFunc {
 			userID, err := a.authRepo.ValidateJWT(parts[1])
 			if err != nil {
 				a.logger.Println("Invalid token:", err)
-				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token: " + err.Error()})
 				c.Abort()
 				return
 			}

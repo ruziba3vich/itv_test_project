@@ -108,7 +108,7 @@ func (s *TokenService) RefreshAccessToken(ctx context.Context, refreshToken stri
 }
 
 // ValidateJWT validates a JWT token and returns the user ID
-func (s *TokenService) ValidateJWT(tokenString string) (string, error) {
+func (s *TokenService) ValidateJWT(tokenString string) (uint, error) {
 	// Parse the token and verify the signature method
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		// Check that the signing method is HMAC
@@ -120,19 +120,25 @@ func (s *TokenService) ValidateJWT(tokenString string) (string, error) {
 
 	// Return an error if the token could not be parsed
 	if err != nil {
-		return "", fmt.Errorf("failed to parse token: %v", err)
+		return 0, fmt.Errorf("failed to parse token: %v", err)
 	}
 
 	// Extract and validate claims
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if userID, exists := claims["user_id"].(string); exists {
-			return userID, nil
+		// The issue is here - you're looking for "user_id" but your GenerateTokens
+		// function is using "sub" for the user ID
+		if userIDFloat, exists := claims["sub"]; exists {
+			// Convert the value to uint - JWT stores numbers as float64
+			if userIDFloat, ok := userIDFloat.(float64); ok {
+				return uint(userIDFloat), nil
+			}
+			return 0, fmt.Errorf("user_id is not a number")
 		}
-		return "", fmt.Errorf("user_id not found in token claims")
+		return 0, fmt.Errorf("user_id not found in token claims")
 	}
 
 	// Return an error if the token is not valid
-	return "", fmt.Errorf("invalid token")
+	return 0, fmt.Errorf("invalid token")
 }
 
 // RegisterUser creates a new user

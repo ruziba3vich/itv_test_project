@@ -3,3 +3,18 @@
 {"level":"info","msg":"User registered successfully","time":"2025-04-06T06:36:07+05:00","username":"prodonik"}
 {"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T06:37:56+05:00"}
 {"error":"ERROR: relation \"refresh_tokens\" does not exist (SQLSTATE 42P01)","level":"info","msg":"Failed to generate tokens","time":"2025-04-06T06:37:59+05:00","user_id":1}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:22:37+05:00"}
+{"level":"info","msg":"Tokens generated successfully","time":"2025-04-06T14:22:42+05:00","user_id":1}
+{"level":"info","msg":"User logged in successfully","time":"2025-04-06T14:22:42+05:00","user_id":1}
+{"level":"info","msg":"Invalid token: user_id not found in token claims","time":"2025-04-06T14:26:01+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:35:52+05:00"}
+{"level":"info","msg":"Invalid token: user_id not found in token claims","time":"2025-04-06T14:35:55+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:36:57+05:00"}
+{"level":"info","msg":"Invalid token: user_id not found in token claims","time":"2025-04-06T14:37:00+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:40:14+05:00"}
+{"level":"info","msg":"Invalid token: failed to parse token: token has invalid claims: token is expired","time":"2025-04-06T14:40:20+05:00"}
+{"level":"info","msg":"Access token refreshed","time":"2025-04-06T14:41:45+05:00","user_id":1}
+{"level":"info","msg":"Access token refreshed successfully","time":"2025-04-06T14:41:45+05:00","token":"d128cf57-e005-4d23-8614-74ae39f9eebf"}
+{"level":"info","msg":"Invalid token: user_id not found in token claims","time":"2025-04-06T14:42:11+05:00"}
+{"level":"info","msg":"Starting server on port 7777","time":"2025-04-06T14:45:09+05:00"}
+{"error":"Key: 'GetAllRequest.Limit' Error:Field validation for 'Limit' failed on the 'min' tag","level":"info","msg":"Invalid get all movies request","time":"2025-04-06T14:45:25+05:00"}
