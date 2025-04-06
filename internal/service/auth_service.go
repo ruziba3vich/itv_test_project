@@ -145,7 +145,7 @@ func (s *TokenService) RegisterUser(ctx context.Context, user *models.User) erro
 }
 
 func (s *TokenService) LoginUser(ctx context.Context, req *types.LoginUserRequest) (uint, error) {
-	id, err := s.LoginUser(ctx, req)
+	id, err := s.store.Login(ctx, req.Username, req.Password)
 	if err != nil {
 		s.log.Error("error logging in user: " + err.Error())
 	}
