@@ -64,7 +64,7 @@ func RunServer(lc fx.Lifecycle, router *gin.Engine, logger *logger.Logger, cfg *
 		OnStart: func(ctx context.Context) error {
 			go func() {
 				logger.Info("Starting server on port 7777")
-				if err := router.Run(":" + cfg.AppPort); err != nil {
+				if err := router.Run(cfg.AppPort); err != nil {
 					logger.Error("Failed to start server: " + err.Error())
 				}
 			}()
