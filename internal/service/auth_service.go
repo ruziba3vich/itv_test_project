@@ -31,8 +31,8 @@ func NewTokenService(store *storage.UserStorage, log *logger.Logger, cfg *config
 		store:      store,
 		log:        log,
 		secret:     cfg.JwtSecret,
-		accessTTL:  15 * time.Minute,
-		refreshTTL: 7 * 24 * time.Hour,
+		accessTTL:  time.Duration(cfg.AccessTTL) * time.Minute,
+		refreshTTL: time.Duration(cfg.RefreshTTL) * 24 * time.Hour,
 	}
 }
 
