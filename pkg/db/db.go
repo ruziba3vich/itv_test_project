@@ -10,11 +10,16 @@ import (
 )
 
 // NewDB initializes a new GORM database connection using the provided config
-func NewDB(cfg *config.DBConfig) (*gorm.DB, error) {
+func NewDB(cfg *config.Config) (*gorm.DB, error) {
 	// Construct the DSN from the config
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		cfg.Host, cfg.User, cfg.Password, cfg.DBName, cfg.Port, cfg.SSLMode,
+		cfg.DBConfig.Host,
+		cfg.DBConfig.User,
+		cfg.DBConfig.Password,
+		cfg.DBConfig.DBName,
+		cfg.DBConfig.Port,
+		cfg.DBConfig.SSLMode,
 	)
 
 	// Open the database connection
