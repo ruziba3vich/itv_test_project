@@ -11,11 +11,13 @@ import (
 
 type (
 	Config struct {
-		DBConfig  *DBConfig
-		Redis     *RedisConfig
-		JwtSecret string
-		RLConfig  *RateLimiterConfig
-		AppPort   string
+		DBConfig   *DBConfig
+		Redis      *RedisConfig
+		JwtSecret  string
+		RLConfig   *RateLimiterConfig
+		AppPort    string
+		AccessTTL  int
+		RefreshTTL int
 	}
 
 	RedisConfig struct {
@@ -66,7 +68,9 @@ func LoadConfig() *Config {
 			Window:     time.Duration(getEnvInt("RL_WINDOW", 1) * int(time.Minute)),
 			RefillRate: getEnvFloat("RL_REFILL_RATE", 0.25),
 		},
-		AppPort: getEnv("APP_PORT", ":7777"),
+		AppPort:    getEnv("APP_PORT", ":7777"),
+		AccessTTL:  getEnvInt("ACCESS_TTL", 15),
+		RefreshTTL: getEnvInt("REFRESH_TTL", 30),
 	}
 	return cfg
 }

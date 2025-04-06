@@ -31,8 +31,8 @@ func NewTokenService(store *storage.UserStorage, log *logger.Logger, cfg *config
 		store:      store,
 		log:        log,
 		secret:     cfg.JwtSecret,
-		accessTTL:  15 * time.Minute,   // Access token expires in 15 minutes
-		refreshTTL: 7 * 24 * time.Hour, // Refresh token expires in 7 days
+		accessTTL:  15 * time.Minute,
+		refreshTTL: 7 * 24 * time.Hour,
 	}
 }
 
