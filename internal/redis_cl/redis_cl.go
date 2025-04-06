@@ -1,4 +1,4 @@
-package rediscl
+package redis_service
 
 import (
 	"context"
