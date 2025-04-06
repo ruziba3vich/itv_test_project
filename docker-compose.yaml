@@ -1,0 +1,102 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: itv_test_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      dragonfly:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: root_user
+      DB_PASSWORD: Dost0n1k
+      DB_NAME: itv_test
+      DB_PORT: 5432
+      DB_SSLMODE: disable
+      REDIS_HOST: dragonfly
+      REDIS_PORT: 6379
+      REDIS_PWD: ""
+      REDIS_DB: 0
+      JWT_SECRET: prodonik
+      RL_MAX_TOKENS: 4
+      RL_WINDOW: 1
+      RL_REFILL_RATE: 0.25
+    ports:
+      - "7777:7777"
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7777/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: itv_test
+      POSTGRES_USER: root_user
+      POSTGRES_PASSWORD: Dost0n1k
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root_user -d itv_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    container_name: dragonfly
+    restart: always
+    volumes:
+      - dragonfly_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+    name: itv_test_postgres_data
+  dragonfly_data:
+    name: itv_test_dragonfly_data
+
+networks:
+  my_network:
+    name: itv_test_network
+    driver: bridge
