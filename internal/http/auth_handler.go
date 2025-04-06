@@ -26,10 +26,29 @@ func NewAuthHandler(authRepo repos.AuthRepo, userSvc *service.TokenService, log 
 	}
 }
 
-// RegisterRoutes sets up authentication routes
-func (h *AuthHandler) RegisterRoutes(router *gin.Engine) {
-	router.POST("/login", h.Login)
-	router.POST("/refresh", h.RefreshToken)
+// Login godoc
+// @Summary User registration
+// @Description Registers a new user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param credentials body types.CreateUserRequest true "User credentials"
+// @Success 200 {object} gin.H
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Failure 500 {object} gin.H
+// @Router /login [post]
+func (h *AuthHandler) RegisterUser(c *gin.Context) {
+	var req types.CreateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.log.Warn("Invalid login request", map[string]interface{}{
+			"error": err.Error(),
+		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+
+	// h.authRepo.
 }
 
 // Login godoc
@@ -38,8 +57,8 @@ func (h *AuthHandler) RegisterRoutes(router *gin.Engine) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param credentials body struct{ Username string; Password string } true "User credentials"
-// @Success 200 {object} map[string]string
+// @Param credentials body types.LoginUserRequest true "User credentials"
+// @Success 200 {object} types.LoginUserResponse
 // @Failure 400 {object} gin.H
 // @Failure 401 {object} gin.H
 // @Failure 500 {object} gin.H
