@@ -16,17 +16,19 @@ func RegisterMovieRoutes(router *gin.Engine, middleware *middleware.AuthHandler,
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	authMiddleware := middleware.AuthMiddleware()
+	movie_router := router.Group("api/v1")
 	// Register your routes
-	router.POST("/movies", authMiddleware(handler.CreateMovie))
-	router.GET("/movies", handler.GetAllMovies)
-	router.GET("/movies/:id", handler.GetMovieByID)
-	router.PUT("/movies/:id", authMiddleware(handler.UpdateMovie))
-	router.DELETE("/movies/:id", authMiddleware(handler.DeleteMovie))
+	movie_router.POST("/movies", authMiddleware(handler.CreateMovie))
+	movie_router.GET("/movies", handler.GetAllMovies)
+	movie_router.GET("/movies/:id", handler.GetMovieByID)
+	movie_router.PUT("/movies/:id", authMiddleware(handler.UpdateMovie))
+	movie_router.DELETE("/movies/:id", authMiddleware(handler.DeleteMovie))
 }
 
 // RegisterRoutes registers all authentication-related routes
 func RegisterAuthRoutes(router *gin.Engine, handler *handlers.AuthHandler) {
-	router.POST("/register", handler.RegisterUser) // Separate endpoint for registration
-	router.POST("/login", handler.Login)
-	router.POST("/refresh", handler.RefreshToken)
+	movie_router := router.Group("api/v1")
+	movie_router.POST("/register", handler.RegisterUser) // Separate endpoint for registration
+	movie_router.POST("/login", handler.Login)
+	movie_router.POST("/refresh", handler.RefreshToken)
 }
