@@ -1,6 +1,27 @@
+// @title ITV Test Project API
+// @version 1.0
+// @description API for movie management
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.example.com/support
+// @contact.email support@example.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:7777
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and the JWT token.
+
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -52,14 +73,14 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 		Password: req.Password,
 	})
 	if err != nil {
-		if err.Error() == "username already taken" {
-			h.log.Warn("Duplicate username during registration", map[string]interface{}{
+		if errors.Is(err, &types.UsernameAlreadyTakenError{}) {
+			h.log.Warn("Duplicate username during registration", map[string]any{
 				"username": req.Username,
 			})
 			c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
 			return
 		}
-		h.log.Error("Failed to register user", map[string]interface{}{
+		h.log.Error("Failed to register user", map[string]any{
 			"error":    err.Error(),
 			"username": req.Username,
 		})
@@ -67,7 +88,7 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	h.log.Info("User registered successfully", map[string]interface{}{
+	h.log.Info("User registered successfully", map[string]any{
 		"username": req.Username,
 	})
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})

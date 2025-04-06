@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   gin.H:
     additionalProperties: {}
@@ -175,8 +176,19 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+host: localhost:7777
 info:
-  contact: {}
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://www.example.com/support
+  description: API for movie management
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: ITV Test Project API
+  version: "1.0"
 paths:
   /login:
     post:
@@ -438,4 +450,10 @@ paths:
       summary: Register a new user
       tags:
       - auth
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and the JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
