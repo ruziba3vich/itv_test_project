@@ -38,8 +38,8 @@ func LoadConfig() *Config {
 	cfg := &Config{
 		DBConfig: &DBConfig{
 			Host:     getEnv(os.Getenv("DB_HOST"), "localhost"),
-			User:     getEnv(os.Getenv("DB_USER"), "5432"),
-			Password: getEnv(os.Getenv("DB_PASSWORD"), "password"),
+			User:     getEnv(os.Getenv("DB_USER"), "root_user"),
+			Password: getEnv(os.Getenv("DB_PASSWORD"), "Dost0n1k"),
 			DBName:   getEnv(os.Getenv("DB_NAME"), "itv_test"),
 			Port:     getEnv(os.Getenv("DB_PORT"), "5432"),
 			SSLMode:  getEnv(os.Getenv("DB_SSLMODE"), "disable"),
