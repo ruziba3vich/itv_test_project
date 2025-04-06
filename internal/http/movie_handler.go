@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ruziba3vich/itv_test_project/internal/repos"
-	"github.com/ruziba3vich/itv_test_project/internal/service"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 
@@ -20,7 +19,7 @@ type MovieHandler struct {
 }
 
 // NewMovieHandler creates a new MovieHandler with dependencies
-func NewMovieHandler(svc *service.MovieService, log *logger.Logger) *MovieHandler {
+func NewMovieHandler(svc repos.IMovieService, log *logger.Logger) *MovieHandler {
 	return &MovieHandler{svc: svc, log: log}
 }
 
