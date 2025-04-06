@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/ruziba3vich/itv_test_project/internal/models"
+	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -34,7 +35,7 @@ func (s *UserStorage) CreateUser(ctx context.Context, user *models.User) error {
 		return fmt.Errorf("failed to verify username availability: %s", err.Error())
 	}
 	if existingUser != nil {
-		return fmt.Errorf("this username is already taken")
+		return &types.UsernameAlreadyTakenError{}
 	}
 	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(user).Error; err != nil {
