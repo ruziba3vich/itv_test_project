@@ -3,15 +3,17 @@ package routereg
 import (
 	"github.com/gin-gonic/gin"
 	handlers "github.com/ruziba3vich/itv_test_project/internal/http"
+	"github.com/ruziba3vich/itv_test_project/internal/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // RegisterRoutes registers all routes, injecting the necessary dependencies
-func RegisterMovieRoutes(router *gin.Engine, authMiddleware func(gin.HandlerFunc) gin.HandlerFunc, handler *handlers.MovieHandler) {
+func RegisterMovieRoutes(router *gin.Engine, middleware *middleware.AuthHandler, handler *handlers.MovieHandler) {
 	// Swagger route
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	authMiddleware := middleware.AuthMiddleware()
 	// Register your routes
 	router.POST("/movies", authMiddleware(handler.CreateMovie))
 	router.GET("/movies", handler.GetAllMovies)

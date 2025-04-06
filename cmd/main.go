@@ -21,6 +21,7 @@ func main() {
 			config.LoadDBConfig,
 			db.NewDB,
 			storage.NewMovieStorage,
+			storage.NewUserStorage,
 			service.NewMovieService,
 			service.NewTokenService,
 			NewGinEngine,
