@@ -1,24 +1,24 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ruziba3vich/itv_test_project/internal/repos"
+	"github.com/ruziba3vich/itv_test_project/pkg/logger"
 	limiter "github.com/ruziba3vich/prodonik_rl"
 )
 
 // AuthHandler holds dependencies for authentication
 type AuthHandler struct {
 	authRepo repos.AuthRepo
-	logger   *log.Logger
+	logger   *logger.Logger
 	limiter  *limiter.TokenBucketLimiter
 }
 
 // NewAuthHandler initializes and returns an AuthHandler instance
-func NewAuthHandler(authRepo repos.AuthRepo, logger *log.Logger, limiter *limiter.TokenBucketLimiter) *AuthHandler {
+func NewAuthHandler(authRepo repos.AuthRepo, logger *logger.Logger, limiter *limiter.TokenBucketLimiter) *AuthHandler {
 	return &AuthHandler{
 		authRepo: authRepo,
 		logger:   logger,

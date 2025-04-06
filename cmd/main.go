@@ -12,6 +12,8 @@ import (
 	"github.com/ruziba3vich/itv_test_project/internal/storage"
 	"github.com/ruziba3vich/itv_test_project/pkg/config"
 	"github.com/ruziba3vich/itv_test_project/pkg/db"
+	"github.com/ruziba3vich/itv_test_project/pkg/logger"
+	rl "github.com/ruziba3vich/prodonik_rl"
 	"go.uber.org/fx"
 )
 
@@ -19,7 +21,9 @@ func main() {
 	app := fx.New(
 		fx.Provide(
 			config.LoadDBConfig,
+			logger.NewLogger,
 			db.NewDB,
+			rl.NewTokenBucketLimiter,
 			storage.NewMovieStorage,
 			storage.NewUserStorage,
 			service.NewMovieService,

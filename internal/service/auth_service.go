@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/ruziba3vich/itv_test_project/internal/models"
+	"github.com/ruziba3vich/itv_test_project/internal/repos"
 	"github.com/ruziba3vich/itv_test_project/internal/storage"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
@@ -24,7 +25,7 @@ type TokenService struct {
 }
 
 // NewTokenService creates a new TokenService
-func NewTokenService(store *storage.UserStorage, log *logger.Logger, secret string) *TokenService {
+func NewTokenService(store *storage.UserStorage, log *logger.Logger, secret string) repos.AuthRepo {
 	return &TokenService{
 		store:      store,
 		log:        log,
