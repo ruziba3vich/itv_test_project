@@ -16,6 +16,12 @@ type (
 	}
 )
 
+func NewUserStorage(db *gorm.DB) *UserStorage {
+	return &UserStorage{
+		db: db,
+	}
+}
+
 // CreateUser adds a new user to the database
 func (s *UserStorage) CreateUser(ctx context.Context, user *models.User) error {
 	hashedPassword, err := hashPassword(user.Password)
