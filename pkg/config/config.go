@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -12,6 +14,7 @@ type (
 		DBConfig  *DBConfig
 		Redis     *RedisConfig
 		JwtSecret string
+		RLConfig  *RateLimiterConfig
 	}
 
 	RedisConfig struct {
@@ -27,6 +30,12 @@ type (
 		Port     string `json:"port" env:"DB_PORT"`
 		SSLMode  string `json:"sslmode" env:"DB_SSLMODE"`
 	}
+
+	RateLimiterConfig struct {
+		MaxTokens  int
+		RefillRate float32
+		Window     time.Duration
+	}
 )
 
 // DBConfig holds database connection settings
@@ -37,22 +46,35 @@ func LoadConfig() *Config {
 
 	cfg := &Config{
 		DBConfig: &DBConfig{
-			Host:     getEnv(os.Getenv("DB_HOST"), "localhost"),
-			User:     getEnv(os.Getenv("DB_USER"), "root_user"),
-			Password: getEnv(os.Getenv("DB_PASSWORD"), "Dost0n1k"),
-			DBName:   getEnv(os.Getenv("DB_NAME"), "itv_test"),
-			Port:     getEnv(os.Getenv("DB_PORT"), "5432"),
-			SSLMode:  getEnv(os.Getenv("DB_SSLMODE"), "disable"),
+			Host:     getEnv("DB_HOST", "localhost"),
+			User:     getEnv("DB_USER", "root_user"),
+			Password: getEnv("DB_PASSWORD", "Dost0n1k"),
+			DBName:   getEnv("DB_NAME", "itv_test"),
+			Port:     getEnv("DB_PORT", "5432"),
+			SSLMode:  getEnv("DB_SSLMODE", "disable"),
 		},
 		Redis: &RedisConfig{
-			Host:     getEnv(os.Getenv("REDIS_HOST"), "localhost"),
-			Port:     getEnv(os.Getenv("REDIS_PORT"), "6379"),
-			Password: getEnv(os.Getenv("REDIS_PWD"), "password"),
-			DB:       getEnvInt(os.Getenv("REDIS_DB"), 0),
+			Host:     getEnv("REDIS_HOST", "localhost"),
+			Port:     getEnv("REDIS_PORT", "6379"),
+			Password: getEnv("REDIS_PWD", "password"),
+			DB:       getEnvInt("REDIS_DB", 0),
 		},
 		JwtSecret: getEnv("JWT_SECRET", "prodonik"),
+		RLConfig: &RateLimiterConfig{
+			MaxTokens:  getEnvInt("RL_MAX_TOKENS", 4),
+			Window:     time.Duration(getEnvInt("RL_WINDOW", 1) * int(time.Minute)),
+			RefillRate: getEnvFloat("RL_REFILL_RATE", 0.25),
+		},
 	}
 	return cfg
+}
+
+func getEnvFloat(key string, fallback float32) float32 {
+	if value, exists := os.LookupEnv(key); exists {
+		window, _ := strconv.ParseFloat(value, 32)
+		return float32(window)
+	}
+	return fallback
 }
 
 func getEnv(key, fallback string) string {
