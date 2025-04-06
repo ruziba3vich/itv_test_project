@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ruziba3vich/itv_test_project/internal/repos"
 	"github.com/ruziba3vich/itv_test_project/internal/service"
 	"github.com/ruziba3vich/itv_test_project/internal/types"
 	"github.com/ruziba3vich/itv_test_project/pkg/logger"
@@ -14,7 +15,7 @@ import (
 
 // MovieHandler handles HTTP requests for movies
 type MovieHandler struct {
-	svc *service.MovieService
+	svc repos.IMovieService
 	log *logger.Logger
 }
 
