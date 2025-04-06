@@ -54,7 +54,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	err := h.authRepo.LoginUser(c.Request.Context(), &req)
+	id, err := h.authRepo.LoginUser(c.Request.Context(), &req)
 	if err != nil {
 		h.log.Error("Failed to retrieve user", map[string]interface{}{
 			"error":    err.Error(),
@@ -64,44 +64,20 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// h.authRepo.GenerateTokens(c.Request.Context(), )
+	accessTokenStr, refreshTokenStr, err := h.authRepo.GenerateTokens(c.Request.Context(), id)
+	if err != nil {
+		h.log.Error("Failed to retrieve user", map[string]interface{}{
+			"error":    err.Error(),
+			"username": req.Username,
+		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "login failed"})
+		return
+	}
 
-	// // Validate user credentials
-	// user, err := h.userSvc.GetUserByUsername(c.Request.Context(), req.Username)
-	// if err != nil {
-	// 	h.log.Error("Failed to retrieve user", map[string]interface{}{
-	// 		"error":    err.Error(),
-	// 		"username": req.Username,
-	// 	})
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "login failed"})
-	// 	return
-	// }
-	// if user == nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)) != nil {
-	// 	h.log.Warn("Invalid login attempt", map[string]interface{}{
-	// 		"username": req.Username,
-	// 	})
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-	// 	return
-	// }
-
-	// // Generate tokens
-	// accessToken, refreshToken, err := h.authRepo.GenerateTokens(c.Request.Context(), user.ID)
-	// if err != nil {
-	// 	h.log.Error("Failed to generate tokens", map[string]interface{}{
-	// 		"error":   err.Error(),
-	// 		"user_id": user.ID,
-	// 	})
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate tokens"})
-	// 	return
-	// }
-
-	// h.log.Info("User logged in successfully", map[string]interface{}{
-	// 	"user_id": user.ID,
-	// })
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"access_token":  accessToken,
-	// 	"refresh_token": refreshToken,
-	// })
+	c.JSON(http.StatusOK, types.LoginUserResponse{
+		AccessToken:  accessTokenStr,
+		RefreshToken: refreshTokenStr,
+	})
 }
 
 // RefreshToken godoc
