@@ -47,21 +47,35 @@ docker compose up -d --build
 ## API Endpoints
 Authentication Routes (/api/v1)
 Method	Endpoint	Description	Request Body	Response Body	Authentication
-POST	/register	Register a new user	CreateUserRequest	Success: 200, Error: 409/500	None
-POST	/login	Login and get tokens	LoginUserRequest	LoginUserResponse	None
-POST	/refresh	Refresh access token	RefreshTokenReq	RefreshTokenResponse	None
-Movie Routes (/api/v1)
+
+-- POST	/register	Register a new user	CreateUserRequest	Success: 200, Error: 409/500 None
+
+-- POST	/login	Login and get tokens	LoginUserRequest	LoginUserResponse	None
+
+-- POST	/refresh	Refresh access token	RefreshTokenReq	RefreshTokenResponse	None
+
+## Movie Routes (/api/v1)
+
 Method	Endpoint	Description	Request Body/Params	Response Body	Authentication
-POST	/movies	Create a new movie	CreateMovieRequest	CreateMovieResponse	Required
-GET	/movies	Get all movies (paginated)	Query: limit, offset	GetAllResponse	None
-GET	/movies/:id	Get a movie by ID	URI: id	GetByIDResponse or null	None
-PUT	/movies/:id	Update a movie by ID	URI: id, UpdateMovieRequest	UpdateMovieResponse	Required
-DELETE	/movies/:id	Delete a movie by ID	URI: id	DeleteMovieResponse	Required
-Utility Routes
+
+-- POST	/movies	Create a new movie	CreateMovieRequest	CreateMovieResponse	Required
+
+-- GET	/movies	Get all movies (paginated)	Query: limit, offset	GetAllResponse	None
+
+-- GET	/movies/:id	Get a movie by ID	URI: id	GetByIDResponse or null	None
+
+-- PUT	/movies/:id	Update a movie by ID	URI: id, UpdateMovieRequest	UpdateMovieResponse Required
+-- DELETE	/movies/:id	Delete a movie by ID	URI: id	DeleteMovieResponse	Required
+
+## Utility Routes
+
 Method	Endpoint	Description	Response Body
-GET	/health	Check server health	200 OK
-GET	/swagger/*any	Swagger UI	Swagger HTML
-Authentication
+
+-- GET	/health	Check server health	200 OK
+
+-- GET	/swagger/*any	Swagger UI	Swagger HTML
+
+## Authentication
 
     Access Token: Include in the Authorization header as Bearer <access_token> for protected routes.
     Refresh Token: Send in the refresh_token field of the /refresh request body.
